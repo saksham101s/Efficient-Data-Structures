@@ -26,6 +26,7 @@ To install the package in your project, run:
 
 ```bash
 npm install efficient-data-structures
+```
 Usage & API Examples
 Here's how to import and use the data structures in your project.
 
@@ -105,3 +106,4 @@ npm install
 npm test
 License
 This project is licensed under the MIT License.
+
