@@ -1,28 +1,28 @@
-// Node class represents a single element in the list
-class ListNode<T> {
-    public value: T;
-    public next: ListNode<T> | null;
+import { ListNode } from './list-node';
 
-    constructor(value: T) {
-        this.value = value;
-        this.next = null;
-    }
-}
-
-// LinkedList class implements the full data structure
 export class LinkedList<T> {
-    private head: ListNode<T> | null;
-    private tail: ListNode<T> | null;
-    private size: number;
+    public head: ListNode<T> | null = null;
+    public tail: ListNode<T> | null = null;
+    public size: number = 0;
 
-    constructor() {
-        this.head = null;
-        this.tail = null;
-        this.size = 0;
+    /**
+     * Checks if the linked list is empty.
+     * @returns True if the list has no elements, otherwise false.
+     */
+    public isEmpty(): boolean {
+        return this.size === 0;
     }
 
     /**
-     * Appends a new node with the given value to the end of the list.
+     * Returns the number of elements in the linked list.
+     * @returns The size of the list.
+     */
+    public getSize(): number {
+        return this.size;
+    }
+
+    /**
+     * Appends a new value to the end of the linked list.
      * @param value The value to append.
      */
     public append(value: T): void {
@@ -38,7 +38,7 @@ export class LinkedList<T> {
     }
 
     /**
-     * Prepends a new node with the given value to the start of the list.
+     * Prepends a new value to the start of the linked list.
      * @param value The value to prepend.
      */
     public prepend(value: T): void {
@@ -54,43 +54,44 @@ export class LinkedList<T> {
     }
 
     /**
-     * [NEW] Removes the head node from the list.
-     * @returns The value of the removed head node, or null if the list is empty.
+     * Deletes the first node that matches the predicate.
+     * @param predicate A function to test each element for a condition.
+     * @returns True if an element was deleted, otherwise false.
      */
-    public deleteHead(): T | null {
+    public deleteByPredicate(predicate: (value: T) => boolean): boolean {
         if (!this.head) {
-            return null;
+            return false;
         }
 
-        const deletedHeadValue = this.head.value;
-        this.head = this.head.next;
-
-        // If the list becomes empty after deletion
-        if (!this.head) {
-            this.tail = null;
+        if (predicate(this.head.value)) {
+            this.deleteHead();
+            return true;
         }
 
-        this.size--;
-        return deletedHeadValue;
+        let currentNode = this.head;
+        while (currentNode.next) {
+            if (predicate(currentNode.next.value)) {
+                if (currentNode.next === this.tail) {
+                    this.tail = currentNode;
+                }
+                currentNode.next = currentNode.next.next;
+                this.size--;
+                return true;
+            }
+            currentNode = currentNode.next;
+        }
+        return false;
     }
-
+    
     /**
-     * [NEW] Returns the value of the head node without removing it.
-     * @returns The value of the head node, or null if the list is empty.
+     * Finds the first node that satisfies the provided testing function.
+     * @param predicate A function to test each element for a condition.
+     * @returns The ListNode if found, otherwise null.
      */
-    public peekHead(): T | null {
-        return this.head ? this.head.value : null;
-    }
-
-    /**
-     * Finds a node with the given value.
-     * @param value The value to find.
-     * @returns The node if found, otherwise null.
-     */
-    public find(value: T): ListNode<T> | null {
+    public findByPredicate(predicate: (value: T) => boolean): ListNode<T> | null {
         let currentNode = this.head;
         while (currentNode) {
-            if (currentNode.value === value) {
+            if (predicate(currentNode.value)) {
                 return currentNode;
             }
             currentNode = currentNode.next;
@@ -99,36 +100,30 @@ export class LinkedList<T> {
     }
 
     /**
-     * Deletes a node with the given value from the list.
-     * @param value The value to delete.
-     * @returns The deleted node if found, otherwise null.
+     * Deletes and returns the head of the list.
+     * @returns The value of the former head, or null if the list was empty.
      */
-    public delete(value: T): ListNode<T> | null {
+    public deleteHead(): T | null {
         if (!this.head) {
             return null;
         }
-
-        if (this.head.value === value) {
-            this.deleteHead();
-            return this.head;
+        const deletedValue = this.head.value;
+        this.head = this.head.next;
+        if (!this.head) {
+            this.tail = null;
         }
-
-        let currentNode = this.head;
-        while (currentNode.next) {
-            if (currentNode.next.value === value) {
-                const deletedNode = currentNode.next;
-                currentNode.next = currentNode.next.next;
-                if (!currentNode.next) {
-                    this.tail = currentNode;
-                }
-                this.size--;
-                return deletedNode;
-            }
-            currentNode = currentNode.next;
-        }
-
-        return null;
+        this.size--;
+        return deletedValue;
     }
+
+    /**
+     * Returns the value of the head of the list without removing it.
+     * @returns The value of the head, or null if the list is empty.
+     */
+    public peekHead(): T | null {
+        return this.head ? this.head.value : null;
+    }
+
 
     /**
      * Returns an array representation of the list.
@@ -142,20 +137,6 @@ export class LinkedList<T> {
             currentNode = currentNode.next;
         }
         return nodes;
-    }
-
-    /**
-     * Gets the current size of the list.
-     */
-    public getSize(): number {
-        return this.size;
-    }
-
-    /**
-     * Checks if the list is empty.
-     */
-    public isEmpty(): boolean {
-        return this.size === 0;
     }
 }
 
